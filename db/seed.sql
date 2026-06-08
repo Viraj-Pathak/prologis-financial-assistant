@@ -1,0 +1,46 @@
+-- Seed data: 20 Prologis-style industrial properties across 11 US metros
+-- Run: psql -U postgres -d financial_assistant -f db/seed.sql
+
+INSERT INTO properties (address, metro_area, sq_footage, property_type) VALUES
+('1545 W 190th St, Torrance',              'Los Angeles',   450000, 'Industrial'),
+('4200 Bandini Blvd, Vernon',              'Los Angeles',   380000, 'Logistics'),
+('11600 S Alameda St, Los Angeles',        'Los Angeles',   265000, 'Warehouse'),
+('3600 W 35th St, Chicago',               'Chicago',       520000, 'Industrial'),
+('4800 W 135th St, Crestwood',            'Chicago',       310000, 'Logistics'),
+('2200 E 170th St, Lansing',              'Chicago',       415000, 'Warehouse'),
+('250 Moonachie Ave, Moonachie',          'New York',      290000, 'Industrial'),
+('900 Stewart Ave, Garden City',          'New York',      340000, 'Logistics'),
+('3401 Enterprise Pkwy, Beachwood',       'Kansas City',   480000, 'Industrial'),
+('900 N Westmoreland Rd, Dallas',         'Dallas',        635000, 'Logistics'),
+('1800 W Crosby Rd, Carrollton',          'Dallas',        395000, 'Industrial'),
+('8200 NW 74th Ave, Medley',              'Miami',         275000, 'Warehouse'),
+('3600 NW 82nd Ave, Doral',              'Miami',         320000, 'Logistics'),
+('6150 Corson Ave S, Seattle',            'Seattle',       410000, 'Industrial'),
+('3150 E Roanoke St, Phoenix',            'Phoenix',       560000, 'Logistics'),
+('4600 NE Columbia Blvd, Portland',       'Portland',      380000, 'Warehouse'),
+('3400 S Front St, Philadelphia',         'Philadelphia',  490000, 'Industrial'),
+('2100 Sullivan Rd, College Park',        'Atlanta',       445000, 'Logistics'),
+('1200 Airport Blvd, Aurora',             'Kansas City',   330000, 'Warehouse'),
+('5500 W Buckeye Rd, Phoenix',            'Phoenix',       600000, 'Industrial');
+
+INSERT INTO financials (property_id, revenue, net_income, expenses, fiscal_year) VALUES
+(1,   8100000.00,  2430000.00,  5670000.00, 2024),
+(2,   6840000.00,  2052000.00,  4788000.00, 2024),
+(3,   4770000.00,  1431000.00,  3339000.00, 2024),
+(4,   9360000.00,  2808000.00,  6552000.00, 2024),
+(5,   5580000.00,  1674000.00,  3906000.00, 2024),
+(6,   7470000.00,  2241000.00,  5229000.00, 2024),
+(7,   5220000.00,  1566000.00,  3654000.00, 2024),
+(8,   6120000.00,  1836000.00,  4284000.00, 2024),
+(9,   8640000.00,  2592000.00,  6048000.00, 2024),
+(10, 11430000.00,  3429000.00,  8001000.00, 2024),
+(11,  7110000.00,  2133000.00,  4977000.00, 2024),
+(12,  4950000.00,  1485000.00,  3465000.00, 2024),
+(13,  5760000.00,  1728000.00,  4032000.00, 2024),
+(14,  7380000.00,  2214000.00,  5166000.00, 2024),
+(15, 10080000.00,  3024000.00,  7056000.00, 2024),
+(16,  6840000.00,  2052000.00,  4788000.00, 2024),
+(17,  8820000.00,  2646000.00,  6174000.00, 2024),
+(18,  8010000.00,  2403000.00,  5607000.00, 2024),
+(19,  5940000.00,  1782000.00,  4158000.00, 2024),
+(20, 10800000.00,  3240000.00,  7560000.00, 2024);
