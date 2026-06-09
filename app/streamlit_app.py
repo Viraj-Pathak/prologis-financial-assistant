@@ -36,7 +36,7 @@ p, div, span, label { font-size: 1rem; }
 
 h2, .stSubheader { font-size: 1.4rem !important; }
 
-.stButton > button { font-size: 0.95rem !important; }
+.stButton > button { font-size: 0.95rem !important; font-weight: 700 !important; }
 
 .stSelectbox label, .stSlider label, .stRadio label,
 .stNumberInput label { font-size: 1rem !important; }
