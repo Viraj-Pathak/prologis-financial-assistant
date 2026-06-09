@@ -605,13 +605,3 @@ with tab_ml:
                         st.image(str(p))
 
 
-st.markdown("""
-<div style="text-align:center;padding:20px 0 8px;color:#94a3b8;font-size:0.8rem;
-            border-top:1px solid #e2e8f0;margin-top:32px">
-  Prologis Financial Assistant &nbsp;·&nbsp;
-  Google Cloud Vertex AI (Gemini 2.5 Flash) &nbsp;·&nbsp;
-  AWS SageMaker &nbsp;·&nbsp;
-  AWS Bedrock (Claude Haiku 4.5) &nbsp;·&nbsp;
-  Supabase Postgres
-</div>
-""", unsafe_allow_html=True)
