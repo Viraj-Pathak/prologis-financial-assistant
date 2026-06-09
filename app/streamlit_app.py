@@ -442,7 +442,16 @@ with tab_ml:
         )
 
         reg_ep = _ENV.get("SAGEMAKER_REGRESSION_ENDPOINT") or os.getenv("SAGEMAKER_REGRESSION_ENDPOINT", "")
-        if not reg_ep:
+        if reg_ep:
+            st.markdown(
+                f'<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;'
+                f'padding:8px 14px;margin-bottom:12px;font-size:0.88rem;color:#065f46">'
+                f'🟢 <strong>SageMaker Endpoint Active</strong> &nbsp;·&nbsp; '
+                f'<code style="background:#dcfce7;padding:2px 6px;border-radius:4px">{reg_ep}</code>'
+                f'&nbsp;·&nbsp; Region: us-east-1</div>',
+                unsafe_allow_html=True,
+            )
+        else:
             st.warning("Set `SAGEMAKER_REGRESSION_ENDPOINT` in `.env` to enable live SageMaker predictions.")
 
         c1, c2 = st.columns(2)
@@ -523,7 +532,16 @@ with tab_ml:
         )
 
         clf_ep = _ENV.get("SAGEMAKER_CLASSIFICATION_ENDPOINT") or os.getenv("SAGEMAKER_CLASSIFICATION_ENDPOINT", "")
-        if not clf_ep:
+        if clf_ep:
+            st.markdown(
+                f'<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;'
+                f'padding:8px 14px;margin-bottom:12px;font-size:0.88rem;color:#065f46">'
+                f'🟢 <strong>SageMaker Endpoint Active</strong> &nbsp;·&nbsp; '
+                f'<code style="background:#dcfce7;padding:2px 6px;border-radius:4px">{clf_ep}</code>'
+                f'&nbsp;·&nbsp; Region: us-east-1</div>',
+                unsafe_allow_html=True,
+            )
+        else:
             st.warning("Set `SAGEMAKER_CLASSIFICATION_ENDPOINT` in `.env` to enable live SageMaker predictions.")
 
         c3, c4 = st.columns(2)
