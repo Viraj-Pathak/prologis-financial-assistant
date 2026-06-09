@@ -29,26 +29,32 @@ st.markdown("""
 
 html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
-    font-size: 16px;
+    font-size: 18px;
 }
 
-p, div, span, label { font-size: 1rem; }
+p, div, span, label { font-size: 1.05rem; }
 
-h2, .stSubheader { font-size: 1.4rem !important; }
+h2, .stSubheader { font-size: 1.55rem !important; }
 
 .stButton > button,
 .stButton > button p,
 .stButton > button div,
 button[kind="secondary"],
 button[kind="primary"] {
-    font-size: 0.95rem !important;
+    font-size: 1.05rem !important;
     font-weight: 700 !important;
 }
 
 .stSelectbox label, .stSlider label, .stRadio label,
-.stNumberInput label { font-size: 1rem !important; }
+.stNumberInput label { font-size: 1.05rem !important; }
 
-.stDataFrame, .stTable { font-size: 0.95rem; }
+.stSelectbox div[data-baseweb="select"] { font-size: 1.05rem !important; }
+
+.stDataFrame, .stTable { font-size: 1rem; }
+
+.stCaption, .stMarkdown p { font-size: 1rem !important; }
+
+.stExpander summary { font-size: 1.05rem !important; }
 
 .app-header {
     background: white;
