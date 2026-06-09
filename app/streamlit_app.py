@@ -233,11 +233,17 @@ tab_chat, tab_data, tab_ml = st.tabs(["💬  Chat", "📊  Data", "🤖  ML Pred
 # CHAT TAB
 # ──────────────────────────────────────────────────────────────────
 with tab_chat:
-    st.subheader("Ask anything about Prologis")
-    st.caption("🤖 Gemini 2.5 Flash via Google Vertex AI — automatically routes each question to Postgres, SEC EDGAR, or press releases.")
+    header_col, clear_col = st.columns([5, 1])
+    header_col.subheader("Ask anything about Prologis")
+    header_col.caption("🤖 Gemini 2.5 Flash via Google Vertex AI — routes each question to Postgres, SEC EDGAR, or press releases.")
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
+
+    if st.session_state.messages:
+        if clear_col.button("🗑 Clear", key="clear_chat", use_container_width=True):
+            st.session_state.messages = []
+            st.rerun()
 
     st.markdown("**Try one of these questions:**")
     suggestions = [
@@ -287,11 +293,6 @@ with tab_chat:
                     for tc in msg["tool_calls"]:
                         st.markdown(f"**`{tc['tool']}`**")
                         st.json({"args": tc["args"], "result": tc["result"]})
-
-    if st.session_state.messages:
-        if st.button("🗑 Clear conversation", key="clear_chat"):
-            st.session_state.messages = []
-            st.rerun()
 
 
 # ──────────────────────────────────────────────────────────────────
