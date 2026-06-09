@@ -19,7 +19,7 @@ _raw = dotenv_values(_ENV_FILE)
 _GOOGLE_API_KEY = _raw.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
 
 client = genai.Client(api_key=_GOOGLE_API_KEY, vertexai=False)
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-2.0-flash"
 
 SYSTEM_INSTRUCTION = """You are a financial intelligence assistant for Prologis, Inc.
 (NYSE: PLD), a global industrial REIT. You have access to four tools:
