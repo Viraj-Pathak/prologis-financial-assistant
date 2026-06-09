@@ -133,10 +133,12 @@ Verify with `psql ... -c "SELECT COUNT(*) FROM properties;"` — should return `
 
 ### Vertex AI / Google AI Studio
 
-The chatbot routes through the **Google Generative AI API** using the unified `google-genai` SDK. The agent declares tool schemas and Gemini 2.5 Flash decides which tools to call — this is the same function-calling primitive the **Vertex AI Agent Development Kit (ADK)** is built on.
+The chatbot is powered by **Gemini 2.5 Flash**, accessed through **Google AI Studio** — Google's developer interface to the same underlying Vertex AI Gemini models. The unified `google-genai` SDK is used in both AI Studio and full Vertex AI setups; the only difference is authentication. The agent declares tool schemas and Gemini decides which tools to call — this is the same **function-calling primitive the Vertex AI Agent Development Kit (ADK)** is built on.
+
+> **Note:** This project uses an AI Studio API key (`GOOGLE_GENAI_USE_VERTEXAI=False`) rather than a Vertex AI service account. Both access the identical Gemini 2.5 Flash model and support the same function-calling capabilities. AI Studio is Google's recommended entry point for developers building with Vertex AI Gemini models.
 
 1. Go to https://aistudio.google.com/app/apikey
-2. Create a new API key and copy it
+2. Create a new API key, link it to a billing-enabled project, and copy it
 3. Add to `.env`:
    ```
    GOOGLE_API_KEY=AIza...
