@@ -4,7 +4,7 @@ End-to-end AI-powered Financial Assistant Web Application for **Prologis (NYSE: 
 
 Built as a multi-cloud system: Postgres (Supabase) for structured data, **AWS SageMaker** for ML model hosting, **Google Cloud Vertex AI** (Gemini 2.5 Flash with function calling) for the conversational agent, and **AWS Bedrock** (Claude Haiku 4.5) for summarization.
 
-**Live app:** https://prologis-financial-assistant.streamlit.app
+**Live app:** https://prologis-financial-assistant-bqs9hvup7nfq8th64qn3iv.streamlit.app/
 
 ---
 
