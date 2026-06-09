@@ -147,7 +147,7 @@ st.markdown("""
     AI-powered financial intelligence platform — conversational agent with function calling,
     real-time property and SEC data, and predictive machine learning.
   </div>
-  <span class="badge badge-gcp">GCP · Vertex AI · Gemini 2.5 Flash</span>
+  <span class="badge badge-gcp">GCP · Vertex AI · Gemini 2.0 Flash</span>
   <span class="badge badge-aws">AWS · SageMaker · Bedrock (Claude Haiku)</span>
   <span class="badge badge-pg">Supabase · Postgres</span>
 </div>
@@ -234,7 +234,7 @@ tab_chat, tab_data, tab_ml = st.tabs(["💬  Chat", "📊  Data", "🤖  ML Pred
 # ──────────────────────────────────────────────────────────────────
 with tab_chat:
     st.subheader("Ask anything about Prologis")
-    st.caption("🤖 Gemini 2.5 Flash via Google Vertex AI — routes each question to Postgres, SEC EDGAR, or press releases.")
+    st.caption("🤖 Gemini 2.0 Flash via Google Vertex AI — routes each question to Postgres, SEC EDGAR, or press releases.")
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
