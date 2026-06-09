@@ -4,6 +4,8 @@ End-to-end AI-powered Financial Assistant Web Application for **Prologis (NYSE: 
 
 Built as a multi-cloud system: Postgres (Supabase) for structured data, **AWS SageMaker** for ML model hosting, **Google Cloud Vertex AI** (Gemini 2.5 Flash with function calling) for the conversational agent, and **AWS Bedrock** (Claude Haiku 4.5) for summarization.
 
+**Live app:** https://prologis-financial-assistant.streamlit.app
+
 ---
 
 ## Architecture
@@ -11,7 +13,7 @@ Built as a multi-cloud system: Postgres (Supabase) for structured data, **AWS Sa
 ```
                   ┌─────────────────────────────────────────────┐
                   │        Streamlit Web App (Frontend)         │
-                  │  💬 Chat   📊 Data Browser   🤖 ML Tab      │
+                  │     💬 Chat   📊 Data   🤖 ML Predictions   │
                   └──────┬──────────┬──────────────┬────────────┘
                          │          │              │
           ┌──────────────┴──┐    ┌──┴──────┐   ┌───┴──────────────┐
@@ -76,14 +78,13 @@ prologis-financial-assistant/
 │   │   ├── inference.py    # SageMaker inference handler
 │   │   └── metrics.json    # generated after training
 │   └── plots/              # generated evaluation plots
-├── notebooks/
-│   ├── regression_training.ipynb
-│   └── classification_training.ipynb
 ├── scripts/
 │   ├── fetch_sec.py        # pull SEC EDGAR data
 │   ├── deploy_sagemaker.py # deploy both endpoints to SageMaker
 │   ├── delete_endpoints.py # cleanup endpoints after demo
 │   └── generate_plots.py   # render evaluation plots
+├── .streamlit/
+│   └── config.toml         # Streamlit theme configuration
 ├── requirements.txt
 └── .env.example
 ```
@@ -97,12 +98,12 @@ prologis-financial-assistant/
 - Python 3.9 (required — SageMaker sklearn 1.2-1 container uses Python 3.9)
 - Postgres 15+ (or a Supabase project)
 - AWS account with Bedrock and SageMaker access
-- Google Cloud project with Vertex AI enabled (Express Mode)
+- Google AI Studio API key (Gemini 2.5 Flash)
 
 ### 1. Clone and Install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Viraj-Pathak/prologis-financial-assistant.git
 cd prologis-financial-assistant
 
 # Use Python 3.9 to match SageMaker container
@@ -121,39 +122,41 @@ cp .env.example .env
 
 Required environment variables:
 ```
-GOOGLE_API_KEY=...          # From https://aistudio.google.com/app/apikey
-GOOGLE_GENAI_USE_VERTEXAI=True
-POSTGRES_HOST=...           # Supabase or local Postgres
+GOOGLE_API_KEY=...              # From https://aistudio.google.com/app/apikey
+GOOGLE_GENAI_USE_VERTEXAI=False
+POSTGRES_HOST=...               # Supabase Session Pooler host
 POSTGRES_USER=...
 POSTGRES_PASSWORD=...
-POSTGRES_DB=financial_assistant
+POSTGRES_DB=postgres
+POSTGRES_PORT=5432
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
 AWS_REGION=us-east-1
 SAGEMAKER_BUCKET=...
 SAGEMAKER_ROLE_ARN=...
+SAGEMAKER_REGRESSION_ENDPOINT=...      # set by deploy_sagemaker.py
+SAGEMAKER_CLASSIFICATION_ENDPOINT=...  # set by deploy_sagemaker.py
 ```
 
 ### 3. Set Up Postgres
 
-**Local:**
-```bash
-createdb financial_assistant
-psql -U postgres -d financial_assistant -f db/schema.sql
-psql -U postgres -d financial_assistant -f db/seed.sql
-```
-
-**Supabase:**
+**Supabase (recommended):**
 1. Create a free project at https://supabase.com
 2. Open SQL Editor → run `db/schema.sql` then `db/seed.sql`
-3. Use the Session Pooler connection string in `.env`
+3. Use the **Session Pooler** connection string in `.env` (IPv4 compatible)
+
+**Local Postgres:**
+```bash
+createdb postgres
+psql -U postgres -d postgres -f db/schema.sql
+psql -U postgres -d postgres -f db/seed.sql
+```
 
 Verify: `psql ... -c "SELECT COUNT(*) FROM properties;"` → should return `20`
 
 ### 4. Fetch SEC Data
 
 ```bash
-# Edit scripts/fetch_sec.py — add your email to USER_AGENT
 python scripts/fetch_sec.py
 ```
 
@@ -202,7 +205,7 @@ python ml/classification/train.py
 | Recall | 0.819 |
 | F1 | 0.555 |
 
-The model prioritizes recall (high-value for a marketing use case — capturing real subscribers matters more than false positives).
+Class weights are balanced to prioritise recall — catching real subscribers matters more than false positives in a marketing campaign.
 
 ### Generate Evaluation Plots
 
@@ -218,9 +221,11 @@ Plots saved to `ml/plots/`.
 python scripts/deploy_sagemaker.py
 ```
 
-- Packages each `model.joblib` → S3
+- Packages each `model.joblib` → `model.tar.gz`
+- Uploads to S3 (`SAGEMAKER_BUCKET`)
 - Creates `SKLearnModel` with `inference.py` as the entry point
-- Deploys to `ml.t2.medium` instances using the `1.2-1` sklearn framework container
+- Deploys to `ml.t2.medium` instances using the sklearn `1.2-1` framework container
+- Writes endpoint names back to `.env`
 
 **After your demo, delete endpoints to stop charges:**
 ```bash
@@ -231,7 +236,7 @@ python scripts/delete_endpoints.py
 
 ## Conversational Agent
 
-The agent uses the **unified `google-genai` SDK** routed through **Google Cloud Vertex AI** Express Mode. Gemini 2.5 Flash decides which tools to call — this is the function-calling primitive the Vertex AI ADK is built on.
+The agent uses the **`google-genai` SDK** with `vertexai=False`, calling the Generative Language API directly via an AI Studio API key. Gemini 2.5 Flash decides which tools to call — this is the function-calling primitive the Vertex AI ADK is built on.
 
 ### Tools
 
@@ -250,9 +255,9 @@ The agent uses the **unified `google-genai` SDK** routed through **Google Cloud 
 | *"Show industrial properties in Chicago"* | `query_postgres(metro_area="Chicago", property_type="Industrial")` |
 | *"Any recent acquisitions?"* | `query_press_releases(category="acquisition")` |
 | *"Summarize the latest earnings"* | `query_press_releases` → `summarize_with_bedrock` |
-| *"Compare Dallas vs Phoenix revenues"* | `query_postgres(metro="Dallas")` → `query_postgres(metro="Phoenix")` |
+| *"What are total assets and liabilities?"* | `query_sec_edgar` (all metrics) |
 
-The last example chains Vertex AI (GCP) → AWS Bedrock — demonstrating the multi-cloud design.
+The press release summary flow chains GCP (Gemini) → AWS (Bedrock), demonstrating the multi-cloud design.
 
 ---
 
@@ -263,9 +268,9 @@ streamlit run app/streamlit_app.py
 ```
 
 **Tabs:**
-- **💬 Chat** — Natural-language Q&A backed by Vertex AI agent
-- **📊 Data** — Properties (Postgres), SEC Filings (EDGAR JSON), Press Releases (JSON)
-- **🤖 ML Predictions** — Sliders that POST to live SageMaker endpoints
+- **💬 Chat** — Natural-language Q&A backed by the Gemini 2.5 Flash agent
+- **📊 Data** — Properties (Postgres), SEC Filings (EDGAR), Press Releases (JSON)
+- **🤖 ML Predictions** — Sliders that POST to live SageMaker endpoints in real time
 
 ---
 
@@ -274,10 +279,9 @@ streamlit run app/streamlit_app.py
 | Cloud | Service | Component |
 |---|---|---|
 | **GCP** | Vertex AI (Gemini 2.5 Flash) | Conversational agent / function-calling orchestrator |
-| **AWS** | SageMaker | Two hosted ML endpoints |
+| **AWS** | SageMaker | Two hosted ML endpoints (regression + classification) |
 | **AWS** | Bedrock (Claude Haiku 4.5) | Press-release summarization |
 | **AWS** | S3 | Model artifact storage |
 | **AWS** | IAM | SageMaker execution role |
-| **Supabase** | Managed Postgres | Properties + financials |
-
-The multi-cloud design is functional: press release summaries go through **Bedrock** (AWS), ML predictions through **SageMaker** (AWS), agent reasoning through **Vertex AI** (GCP).
+| **Supabase** | Managed Postgres | Properties + financials database |
+| **Streamlit Cloud** | Community Cloud | Public web hosting |
