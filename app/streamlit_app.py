@@ -29,14 +29,26 @@ st.markdown("""
 
 html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
+    font-size: 16px;
 }
+
+p, div, span, label { font-size: 1rem; }
+
+h2, .stSubheader { font-size: 1.4rem !important; }
+
+.stButton > button { font-size: 0.95rem !important; }
+
+.stSelectbox label, .stSlider label, .stRadio label,
+.stNumberInput label { font-size: 1rem !important; }
+
+.stDataFrame, .stTable { font-size: 0.95rem; }
 
 .app-header {
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
-    padding: 24px 32px;
-    margin-bottom: 24px;
+    padding: 20px 28px;
+    margin-bottom: 16px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .app-header h1 {
@@ -47,13 +59,13 @@ html, body, [class*="css"] {
 }
 .app-header .subtitle {
     color: #64748b;
-    font-size: 0.9rem;
-    margin-bottom: 14px;
+    font-size: 1rem;
+    margin-bottom: 12px;
     line-height: 1.5;
 }
 .badge {
     display: inline-block;
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 600;
     padding: 4px 12px;
     border-radius: 20px;
@@ -68,9 +80,9 @@ html, body, [class*="css"] {
     background: #f8fafc;
     border-left: 4px solid #1d4ed8;
     border-radius: 0 8px 8px 0;
-    padding: 10px 16px;
-    margin-bottom: 16px;
-    font-size: 0.88rem;
+    padding: 8px 14px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
     color: #475569;
 }
 
@@ -119,8 +131,8 @@ st.markdown("""
 <div class="app-header">
   <h1>🏭 Prologis Financial Assistant</h1>
   <div class="subtitle">
-    AI-powered financial intelligence for Prologis (NYSE: PLD) — conversational agent with
-    function calling, real-time property and SEC data, and predictive machine learning.
+    AI-powered financial intelligence platform — conversational agent with function calling,
+    real-time property and SEC data, and predictive machine learning.
   </div>
   <span class="badge badge-gcp">GCP · Vertex AI · Gemini 2.5 Flash</span>
   <span class="badge badge-aws">AWS · SageMaker · Bedrock (Claude Haiku)</span>
@@ -201,7 +213,7 @@ def call_sagemaker(endpoint_name: str, payload: dict):
         return None
 
 
-tab_chat, tab_data, tab_ml = st.tabs(["💬  Chat", "📊  Data Browser", "🤖  ML Predictions"])
+tab_chat, tab_data, tab_ml = st.tabs(["💬  Chat", "📊  Data", "🤖  ML Predictions"])
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -209,14 +221,7 @@ tab_chat, tab_data, tab_ml = st.tabs(["💬  Chat", "📊  Data Browser", "🤖 
 # ──────────────────────────────────────────────────────────────────
 with tab_chat:
     st.subheader("Ask anything about Prologis")
-    st.markdown(
-        '<div class="section-info">'
-        '🤖 <strong>Gemini 2.5 Flash</strong> via Google Vertex AI automatically routes each question '
-        'to the right tool: Postgres database, SEC EDGAR filings, or press releases. '
-        'Multi-source questions call multiple tools and synthesize the results.'
-        '</div>',
-        unsafe_allow_html=True,
-    )
+    st.caption("🤖 Gemini 2.5 Flash via Google Vertex AI — automatically routes each question to Postgres, SEC EDGAR, or press releases.")
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -230,13 +235,12 @@ with tab_chat:
         "Summarize the latest earnings release",
         "What are total assets and liabilities?",
     ]
-    row1, row2 = st.columns(3), st.columns(3)
+    row1 = st.columns(3)
+    row2 = st.columns(3)
     for i, sug in enumerate(suggestions):
         cols = row1 if i < 3 else row2
         if cols[i % 3].button(sug, key=f"sug_{i}", use_container_width=True):
             st.session_state.pending_query = sug
-
-    st.divider()
 
     user_input = st.chat_input("Type your question about Prologis financials, properties, or news…")
     if "pending_query" in st.session_state:
