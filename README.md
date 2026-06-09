@@ -1,6 +1,6 @@
 # Prologis Financial Assistant
 
-End-to-end AI-powered Financial Assistant Web Application for **Prologis (NYSE: PLD)**, a global industrial real estate investment trust. The platform combines structured data querying, classic machine learning (regression and classification), and generative AI to retrieve financial and property insights, perform predictive analytics, and provide natural-language summaries.
+End-to-end AI-powered Financial Assistant Web Application for **Prologis, a global industrial real estate investment trust. The platform combines structured data querying, classic machine learning (regression and classification), and generative AI to retrieve financial and property insights, perform predictive analytics, and provide natural-language summaries.
 
 Built as a multi-cloud system: Postgres on Supabase for structured data, AWS SageMaker for ML model hosting, **Google Cloud Vertex AI** for the conversational agent (with function calling, the primitive that underpins the Vertex AI Agent Development Kit), and AWS Bedrock (Claude Haiku) for summarization.
 
