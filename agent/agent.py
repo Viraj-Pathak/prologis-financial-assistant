@@ -1,22 +1,9 @@
-"""
-Prologis Financial Assistant — Vertex AI agent with Gemini function calling.
-
-The agent uses Google's unified google-genai SDK routed through Vertex AI
-Express Mode. It declares four tool schemas; Gemini 2.5 Flash decides which
-tools to call and in what order. This is the same function-calling primitive
-that powers the Vertex AI Agent Development Kit (ADK).
-
-Usage:
-    from agent.agent import ask
-    result = ask("What was Prologis' net income last year?")
-    print(result["answer"])
-"""
 import json
 import os
 from typing import Any
 from pathlib import Path
 
-# Must be set BEFORE importing google.genai — the SDK caches this at import time
+# Must be set BEFORE importing google.genai — the SDK reads this at Client() instantiation
 os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "False"
 
 from dotenv import load_dotenv, dotenv_values
@@ -52,7 +39,6 @@ Routing rules:
 Always cite specific figures (dollar amounts, dates, property counts) in your answer.
 Format numbers with commas and dollar signs. Keep answers concise and fact-driven."""
 
-# ── Tool declarations for Gemini function calling ───────────────────────────
 TOOLS = types.Tool(
     function_declarations=[
         types.FunctionDeclaration(
@@ -140,7 +126,7 @@ TOOLS = types.Tool(
     ]
 )
 
-# ── Tool dispatcher ──────────────────────────────────────────────────────────
+
 def _dispatch(name: str, args: dict) -> Any:
     if name == "query_postgres":
         return query_postgres(**args)
@@ -153,15 +139,11 @@ def _dispatch(name: str, args: dict) -> Any:
     return {"error": f"Unknown tool: {name}"}
 
 
-# ── Main agent function ──────────────────────────────────────────────────────
 def ask(question: str, max_turns: int = 6) -> dict:
-    """Send a natural-language question to the Vertex AI agent.
+    """Send a natural-language question to the Gemini agent.
 
     Returns:
-        {
-            "answer": str,           # final natural-language response
-            "tool_calls": [...]      # list of {"tool", "args", "result"} dicts
-        }
+        {"answer": str, "tool_calls": [{"tool", "args", "result"}, ...]}
     """
     history = [types.Content(role="user", parts=[types.Part(text=question)])]
     tool_calls_log = []
@@ -180,7 +162,6 @@ def ask(question: str, max_turns: int = 6) -> dict:
         candidate = response.candidates[0]
         history.append(candidate.content)
 
-        # Check if the model wants to call tools
         function_calls = [
             p.function_call
             for p in candidate.content.parts
@@ -188,45 +169,23 @@ def ask(question: str, max_turns: int = 6) -> dict:
         ]
 
         if not function_calls:
-            # No more tool calls — extract final text answer
             answer = "".join(
                 p.text for p in candidate.content.parts if hasattr(p, "text") and p.text
             )
             return {"answer": answer, "tool_calls": tool_calls_log}
 
-        # Execute each tool call and collect results
         function_responses = []
         for fc in function_calls:
             args = dict(fc.args) if fc.args else {}
             result = _dispatch(fc.name, args)
             tool_calls_log.append({"tool": fc.name, "args": args, "result": result})
             function_responses.append(
-                types.Part.from_function_response(
-                    name=fc.name,
-                    response={"result": result},
-                )
+                types.Part.from_function_response(name=fc.name, response={"result": result})
             )
 
-        history.append(
-            types.Content(role="user", parts=function_responses)
-        )
+        history.append(types.Content(role="user", parts=function_responses))
 
     return {
         "answer": "I reached the maximum number of reasoning steps. Please try a more specific question.",
         "tool_calls": tool_calls_log,
     }
-
-
-if __name__ == "__main__":
-    queries = [
-        "What was Prologis' net income last year?",
-        "Show industrial properties in Chicago with their revenue.",
-        "Did Prologis announce any acquisitions recently? Give me a brief summary.",
-    ]
-    for q in queries:
-        print(f"\n{'='*60}")
-        print(f"Q: {q}")
-        result = ask(q)
-        print(f"A: {result['answer']}")
-        if result["tool_calls"]:
-            print(f"   Tools: {[tc['tool'] for tc in result['tool_calls']]}")
