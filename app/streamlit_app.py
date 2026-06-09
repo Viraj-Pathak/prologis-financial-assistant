@@ -239,10 +239,7 @@ with tab_chat:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    if st.session_state.messages:
-        if st.button("🗑 Clear conversation", key="clear_chat"):
-            st.session_state.messages = []
-            st.rerun()
+    clear_slot = st.empty()  # filled after messages are populated so it shows on the first reply
 
     st.markdown("**Try one of these questions:**")
     suggestions = [
@@ -292,6 +289,12 @@ with tab_chat:
                     for tc in msg["tool_calls"]:
                         st.markdown(f"**`{tc['tool']}`**")
                         st.json({"args": tc["args"], "result": tc["result"]})
+
+    if st.session_state.messages:
+        with clear_slot:
+            if st.button("🗑 Clear conversation", key="clear_chat"):
+                st.session_state.messages = []
+                st.rerun()
 
 
 # ──────────────────────────────────────────────────────────────────
